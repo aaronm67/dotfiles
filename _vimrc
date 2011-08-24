@@ -26,6 +26,7 @@ set tabstop=4
 set softtabstop=4
 set shiftwidth=4
 set expandtab  
+set cindent
 
 autocmd BufRead,BufNewFile *.ejs setfiletype html
 autocmd VimEnter * NERDTree
