@@ -29,47 +29,57 @@ set expandtab
 set cindent
 
 autocmd BufRead,BufNewFile *.ejs setfiletype html
-autocmd VimEnter * NERDTree
-autocmd VimEnter * wincmd l
-autocmd BufNew * NERDTreeMirror
-autocmd BufNew * wincmd l
-autocmd WinEnter * call NERDTreeQuit()
+autocmd VimEnter * silent NERDTree
+autocmd VimEnter * silent wincmd l
+autocmd BufWinEnter * silent loadview
+autocmd TabEnter * silent NERDTreeMirror
+autocmd TabEnter * silent wincmd l
+autocmd WinEnter * call s:CloseIfOnlyNerdTreeLeft()
 
-"make CTRL + T switch tabs
-nmap <C-i> :tabnext<CR>
-map <C-S-tab> :tabprevious<CR>
-map <C-tab> :tabnext<CR>
-imap <C-S-tab> <Esc>:tabprevious<CR>i
-imap <C-tab> <Esc>:tabnext<CR>i
-nmap <C-t> :tabnew<CR>
-imap <C-t> <Esc>:tabnew<CR>
+map <C-left> :tabp<cr>
+map <C-right> :tabn<cr>
+map <C-l> :tabn<cr>
+map <C-h> :tabp<cr>
+map <C-n> :tabclose<CR>
 
 "make CTRL + J the opposite of shift + J
 nnoremap <C-j> i<CR><Esc>   
 "ctrl + n toggles file explorer
 nmap <silent> <c-n> :NERDTreeToggle<CR>
 
-function! NERDTreeQuit()
-  redir => buffersoutput
-  silent buffers
-  redir END
-"                     1BufNo  2Mods.     3File           4LineNo
-  let pattern = '^\s*\(\d\+\)\(.....\) "\(.*\)"\s\+line \(\d\+\)$'
-  let windowfound = 0
 
-  for bline in split(buffersoutput, "\n")
-    let m = matchlist(bline, pattern)
-
-    if (len(m) > 0)
-      if (m[2] =~ '..a..')
-        let windowfound = 1
+" Close all open buffers on entering a window if the only
+" buffer that's left is the NERDTree buffer
+function! s:CloseIfOnlyNerdTreeLeft()
+  if exists("t:NERDTreeBufName")
+    if bufwinnr(t:NERDTreeBufName) != -1
+      if winnr("$") == 1
+        q
       endif
     endif
-  endfor
-
-  if (!windowfound)
-    quitall
   endif
 endfunction
+"function! NERDTreeQuit()
+"  redir => buffersoutput
+"  silent buffers
+"  redir END
+""                     1BufNo  2Mods.     3File           4LineNo
+"  let pattern = '^\s*\(\d\+\)\(.....\) "\(.*\)"\s\+line \(\d\+\)$'
+"  let windowfound = 0
+"
+"  for bline in split(buffersoutput, "\n")
+"    let m = matchlist(bline, pattern)
+"
+"    if (len(m) > 0)
+"      if (m[2] =~ '..a..')
+"        let windowfound = 1
+"      endif
+"    endif
+"  endfor
+"
+"  if (!windowfound)
+"    quitall
+"  endif
+"endfunction
 
 
